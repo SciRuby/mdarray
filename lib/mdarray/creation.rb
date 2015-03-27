@@ -60,7 +60,7 @@ class MDArray
   # @param storage [Array] a ruby array with the initialization data
   #------------------------------------------------------------------------------------
 
-  def self.build(type, shape, storage = nil)
+  def self.build(type, shape, storage = nil, layout = :row)
 
     if (shape.is_a? String)
       # building from csv
@@ -72,18 +72,33 @@ class MDArray
       storage = parameters[2]
     end
 
-    dtype = DataType.valueOf(type.upcase)
+    # Java-NetCDF creates an ArrayObject when given type string.  It should create an
+    # ArrayString instead.  Some string methods in Java-NetCDF expect an ArrayObject
+    # instead of an ArrayString, however, other libraries actually expect an ArrayString,
+    # so we know have two type: "string" stores internally the data as an ArrayObject, 
+    # "rstring" stores data internally as an ArrayString
+    rtype = (type == "rstring")? "string" : type
+    dtype = DataType.valueOf(rtype.upcase)
+
     jshape = shape.to_java :int
 
     if (storage)
-      jstorage = storage.to_java type.downcase.to_sym
-      nc_array = Java::UcarMa2.Array.factory(dtype, jshape, jstorage)
+      jstorage = storage.to_java rtype.downcase.to_sym
+      if (type == "rstring")
+        # circunvent bug in Java-NetCDF.  Type rstring is actually type string but should
+        # and should build and ArrayString and not an ObjectString which is currently being
+        # build.
+        index = Java::UcarMa2.Index.factory(jshape)
+        nc_array = Java::UcarMa2.ArrayString.factory(index, jstorage)
+      else
+        nc_array = Java::UcarMa2.Array.factory(dtype, jshape, jstorage)
+      end
     else
       nc_array = Java::UcarMa2.Array.factory(dtype, jshape)
     end
 
-    klass = Object.const_get("#{type.capitalize}MDArray")
-    return klass.new(type, nc_array)
+    klass = Object.const_get("#{rtype.capitalize}MDArray")
+    return klass.new(rtype, nc_array)
 
   end
 
@@ -92,6 +107,10 @@ class MDArray
   #------------------------------------------------------------------------------------
 
   def self.from_jstorage(type, shape, jstorage, section = false)
+
+    if (shape.size == 1 && shape[0] == 0)
+      return nil
+    end
 
     dtype = DataType.valueOf(type.upcase)
     jshape = shape.to_java :int
@@ -119,8 +138,8 @@ class MDArray
   # @param storage [Array] a ruby array with the initialization data
   #------------------------------------------------------------------------------------
 
-  def self.boolean(shape, storage = nil)
-    self.build("boolean", shape, storage)
+  def self.boolean(shape, storage = nil, layout = :row)
+    self.build("boolean", shape, storage, layout)
   end
 
   #------------------------------------------------------------------------------------
@@ -129,8 +148,8 @@ class MDArray
   # @param storage [Array] a ruby array with the initialization data
   #------------------------------------------------------------------------------------
 
-  def self.byte(shape, storage = nil)
-    self.build("byte", shape, storage)
+  def self.byte(shape, storage = nil, layout = :row)
+    self.build("byte", shape, storage, layout)
   end
 
   #------------------------------------------------------------------------------------
@@ -139,8 +158,8 @@ class MDArray
   # @param storage [Array] a ruby array with the initialization data
   #------------------------------------------------------------------------------------
 
-  def self.char(shape, storage = nil)
-    self.build("char", shape, storage)
+  def self.char(shape, storage = nil, layout = :row)
+    self.build("char", shape, storage, layout)
   end
 
   #------------------------------------------------------------------------------------
@@ -150,8 +169,8 @@ class MDArray
   #
   #------------------------------------------------------------------------------------
 
-  def self.short(shape, storage = nil)
-    self.build("short", shape, storage)
+  def self.short(shape, storage = nil, layout = :row)
+    self.build("short", shape, storage, layout)
   end
 
   #------------------------------------------------------------------------------------
@@ -160,8 +179,8 @@ class MDArray
   # @param storage [Array] a ruby array with the initialization data
   #------------------------------------------------------------------------------------
 
-  def self.int(shape, storage = nil)
-    self.build("int", shape, storage)
+  def self.int(shape, storage = nil, layout = :row)
+    self.build("int", shape, storage, layout)
   end
 
   #------------------------------------------------------------------------------------
@@ -171,8 +190,8 @@ class MDArray
   #
   #------------------------------------------------------------------------------------
 
-  def self.long(shape, storage = nil)
-    self.build("long", shape, storage)
+  def self.long(shape, storage = nil, layout = :row)
+    self.build("long", shape, storage, layout)
   end
 
   #------------------------------------------------------------------------------------
@@ -181,8 +200,8 @@ class MDArray
   # @param storage [Array] a ruby array with the initialization data
   #------------------------------------------------------------------------------------
 
-  def self.float(shape, storage = nil)
-    self.build("float", shape, storage)
+  def self.float(shape, storage = nil, layout = :row)
+    self.build("float", shape, storage, layout)
   end
 
   #------------------------------------------------------------------------------------
@@ -191,18 +210,31 @@ class MDArray
   # @param storage [Array] a ruby array with the initialization data
   #------------------------------------------------------------------------------------
 
-  def self.double(shape, storage = nil)
-    self.build("double", shape, storage)
+  def self.double(shape, storage = nil, layout = :row)
+    self.build("double", shape, storage, layout)
   end
 
   #------------------------------------------------------------------------------------
-  # Builds a string mdarray
+  # Builds a string mdarray. Java-NetCDF does not actuallly build a string array when
+  # type string is passed, it builds an object array.  This is an open issue with 
+  # Java-NetCDF.
   # @param shape [Array] the shape of the mdarray as a ruby array
   # @param storage [Array] a ruby array with the initialization data
   #------------------------------------------------------------------------------------
 
-  def self.string(shape, storage = nil)
-    self.build("string", shape, storage)
+  def self.string(shape, storage = nil, layout = :row)
+    self.build("string", shape, storage, layout)
+  end
+
+  #------------------------------------------------------------------------------------
+  # Builds a string mdarray.  Really builds an string array.  Only exists to fix the
+  # Java-NetCDF issue described above.
+  # @param shape [Array] the shape of the mdarray as a ruby array
+  # @param storage [Array] a ruby array with the initialization data
+  #------------------------------------------------------------------------------------
+
+  def self.rstring(shape, storage = nil, layout = :row)
+    self.build("rstring", shape, storage, layout)
   end
 
   #------------------------------------------------------------------------------------
@@ -211,8 +243,8 @@ class MDArray
   # @param storage [Array] a ruby array with the initialization data
   #------------------------------------------------------------------------------------
 
-  def self.structure(shape, storage = nil)
-    self.build("structure", shape, storage)
+  def self.structure(shape, storage = nil, layout = :row)
+    self.build("structure", shape, storage, layout)
   end
 
   #------------------------------------------------------------------------------------

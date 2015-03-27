@@ -1,49 +1,27 @@
 Announcement
 ============
 
-MDArray version 0.5.4 has Just been released. MDArray is a multi dimensional array implemented 
-for JRuby inspired by NumPy (www.numpy.org) and Masahiro Tanaka´s Narray (narray.rubyforge.org).
+MDArray version 0.5.5.2 has been released. MDArray is a multi dimensional array implemented 
+for JRuby inspired by NumPy (www.numpy.org) and Masahiro Tanaka´s Narray (narray.rubyforge.org).  
 MDArray stands on the shoulders of Java-NetCDF and Parallel Colt.  At this point MDArray has 
-libraries for mathematical, trigonometric and descriptive statistics methods.
+libraries for linear algebra, mathematical, trigonometric and descriptive statistics methods.
 
 NetCDF-Java Library is a Java interface to NetCDF files, as well as to many other types of 
-scientific data formats.  It is developed and distributed by Unidata 
-(http://www.unidata.ucar.edu).
+scientific data formats.  It is developed and distributed by Unidata (http://www.unidata.ucar.edu).
+ 
+Parallel Colt (https://sites.google.com/site/piotrwendykier/software/parallelcolt is a
+ multithreaded version of Colt (http://acs.lbl.gov/software/colt/).  Colt provides a set of 
+Open Source Libraries for High Performance Scientific and Technical Computing in Java. 
+Scientific and technical computing is characterized by demanding problem sizes and a need for 
+high performance at reasonably small memory footprint.
 
-Parallel Colt (http://grepcode.com/snapshot/repo1.maven.org/maven2/net.sourceforge.parallelcolt/
-parallelcolt/0.10.0/) is a multithreaded version of Colt (http://acs.lbl.gov/software/colt/).  
-Colt provides a set of Open Source Libraries for High Performance Scientific and Technical 
-Computing in Java. Scientific and technical computing is characterized by demanding problem 
-sizes and a need for high performance at reasonably small memory footprint.
-
-For more information and (some) documentation please go to: https://github.com/rbotafogo/mdarray/wiki
 
 What´s new:
 ===========
 
-NetCDF-3 File Support
----------------------
-
-From Wikipedia, the free encyclopedia:
-
-"NetCDF (Network Common Data Form) is a set of software libraries and self-describing, 
-machine-independent data formats that support the creation, access, and sharing of array-oriented 
-scientific data. The project homepage is hosted by the Unidata program at the University 
-Corporation for Atmospheric Research (UCAR). They are also the chief source of netCDF software, 
-standards development, updates, etc. The format is an open standard. NetCDF Classic and 64-bit 
-Offset Format are an international standard of the Open Geospatial Consortium.
-
-The project is actively supported by UCAR. Version 4.0 (released in 2008) allows the use of the 
-HDF5 data file format. Version 4.1 (2010) adds support for C and Fortran client access to 
-specified subsets of remote data via OPeNDAP.
-
-The format was originally based on the conceptual model of the Common Data Format developed by 
-NASA, but has since diverged and is not compatible with it."
-
-This version of MDArray implements NetCDF-3 file support only.  NetCDF-4 is not yet supported.  At
-the end of this announcement we show the MDArray implementation of the NetCDF-3 file writing 
-from the tutorial at: 
-http://www.unidata.ucar.edu/software/netcdf-java/tutorial/NetcdfWriting.html
+Version 0.5.5.2 is a bug fix for a class StringArray.  In Java-NetCDF when passing "string" as type
+an ObjectArray is created and not a StringArray.  This version fix this issue and gets a
+StringArray when the "string" type is selected.
 
 
 MDArray and SciRuby:
@@ -64,6 +42,7 @@ MDArray main properties are:
 
  + Homogeneous multidimensional array, a table of elements (usually numbers), all of the 
      same type, indexed by a tuple of positive integers;
+ + Support for many linear algebra methods (see bellow);
  + Easy calculation for large numerical multi dimensional arrays;
  + Basic types are: boolean, byte, short, int, long, float, double, string, structure;
  + Based on JRuby, which allows importing Java libraries;
@@ -81,6 +60,74 @@ MDArray main properties are:
  + StatList: a list that can grow/shrink and that can compute Parallel Colt descriptive 
      statistics;
  + Experimental lazy evaluation (still slower than eager evaluation).
+
+Supported linear algebra methods:
+=================================
+
+  + backwardSolve:  Solves the upper triangular system U*x=b;
+  + chol: Constructs and returns the cholesky-decomposition of the given matrix.
+  + cond: Returns the condition of matrix A, which is the ratio of largest to smallest singular value.
+  + det: Returns the determinant of matrix A.
+  + eig: Constructs and returns the Eigenvalue-decomposition of the given matrix.
+  + forwardSolve:  Solves the lower triangular system L*x=b;
+  + inverse: Returns the inverse or pseudo-inverse of matrix A.
+  + kron: Computes the Kronecker product of two real matrices.
+  + lu: Constructs and returns the LU-decomposition of the given matrix.
+  + mult: Inner product of two vectors; Sum(x[i] * y[i]).
+  + mult: Linear algebraic matrix-vector multiplication; z = A * y.
+  + mult: Linear algebraic matrix-matrix multiplication; C = A x B.
+  + multOuter: Outer product of two vectors; Sets A[i,j] = x[i] * y[j].
+  + norm1: Returns the one-norm of vector x, which is Sum(abs(x[i])).
+  + norm1: Returns the one-norm of matrix A, which is the maximum absolute column sum.
+  + norm2: Returns the two-norm (aka euclidean norm) of vector x; equivalent to Sqrt(mult(x,x)).
+  + norm2: Returns the two-norm of matrix A, which is the maximum singular value; obtained from SVD.
+  + normF: Returns the Frobenius norm of matrix A, which is Sqrt(Sum(A[i]2)).
+  + normF: Returns the Frobenius norm of matrix A, which is Sqrt(Sum(A[i,j]2)).
+  + normInfinity: Returns the infinity norm of vector x, which is Max(abs(x[i])).
+  + normInfinity: Returns the infinity norm of matrix A, which is the maximum absolute row sum.
+  + pow: Linear algebraic matrix power; B = Ak <==> B = A*A*...*A.
+  + qr: Constructs and returns the QR-decomposition of the given matrix.
+  + rank: Returns the effective numerical rank of matrix A, obtained from Singular Value Decomposition.
+  + solve: Solves A*x = b.
+  + solve: Solves A*X = B.
+  + solveTranspose: Solves X*A = B, which is also A'*X' = B'.
+  + svd: Constructs and returns the SingularValue-decomposition of the given matrix.
+  + trace: Returns the sum of the diagonal elements of matrix A; Sum(A[i,i]).
+  + trapezoidalLower: Modifies the matrix to be a lower trapezoidal matrix.
+  + vectorNorm2: Returns the two-norm (aka euclidean norm) of vector X.vectorize();
+  + xmultOuter: Outer product of two vectors; Returns a matrix with A[i,j] = x[i] * y[j].
+  + xpowSlow: Linear algebraic matrix power; B = Ak <==> B = A*A*...*A.
+
+Properties´ methods tested on matrices:
+=======================================
+
+  + density: Returns the matrix's fraction of non-zero cells; A.cardinality() / A.size().
+  + generate_non_singular!: Modifies the given square matrix A such that it is diagonally dominant by row and column, hence non-singular, hence invertible.
+  + diagonal?: A matrix A is diagonal if A[i,j] == 0 whenever i != j.
+  + diagonally_dominant_by_column?: A matrix A is diagonally dominant by column if the absolute value of each diagonal element is larger than the sum of the absolute values of the off-diagonal elements in the corresponding column.
+  + diagonally_dominant_by_row?: A matrix A is diagonally dominant by row if the absolute value of each diagonal element is larger than the sum of the absolute values of the off-diagonal elements in the corresponding row.
+  + identity?: A matrix A is an identity matrix if A[i,i] == 1 and all other cells are zero.
+  + lower_bidiagonal?: A matrix A is lower bidiagonal if A[i,j]==0 unless i==j || i==j+1.
+  + lower_triangular?: A matrix A is lower triangular if A[i,j]==0 whenever i < j.
+  + nonnegative?: A matrix A is non-negative if A[i,j] >= 0 holds for all cells.
+  + orthogonal?: A square matrix A is orthogonal if A*transpose(A) = I.
+  + positive?: A matrix A is positive if A[i,j] > 0 holds for all cells.
+  + singular?: A matrix A is singular if it has no inverse, that is, iff det(A)==0.
+  + skew_symmetric?: A square matrix A is skew-symmetric if A = -transpose(A), that is A[i,j] == -A[j,i].
+  + square?: A matrix A is square if it has the same number of rows and columns.
+  + strictly_lower_triangular?: A matrix A is strictly lower triangular if A[i,j]==0 whenever i <= j.
+  + strictly_triangular?: A matrix A is strictly triangular if it is triangular and its diagonal elements all equal 0.
+  + strictly_upper_triangular?: A matrix A is strictly upper triangular if A[i,j]==0 whenever i >= j.
+  + symmetric?: A matrix A is symmetric if A = tranpose(A), that is A[i,j] == A[j,i].
+  + triangular?: A matrix A is triangular iff it is either upper or lower triangular.
+  + tridiagonal?: A matrix A is tridiagonal if A[i,j]==0 whenever Math.abs(i-j) > 1.
+  + unit_triangular?: A matrix A is unit triangular if it is triangular and its diagonal elements all equal 1.
+  + upper_bidiagonal?: A matrix A is upper bidiagonal if A[i,j]==0 unless i==j || i==j-1.
+  + upper_triangular?: A matrix A is upper triangular if A[i,j]==0 whenever i > j.
+  + zero?: A matrix A is zero if all its cells are zero.
+  + lower_bandwidth: The lower bandwidth of a square matrix A is the maximum i-j for which A[i,j] is nonzero and i > j.
+  + semi_bandwidth: Returns the semi-bandwidth of the given square matrix A.
+  + upper_bandwidth: The upper bandwidth of a square matrix A is the maximum j-i for which A[i,j] is nonzero and j > i.
 
 Descriptive statistics methods imported from Parallel Colt:
 ===========================================================
@@ -133,215 +180,16 @@ Contributors are welcome.
 MDArray History:
 ================
 
-  + 07/08/2013: Version 0.5.4 - Support for reading and writing NetCDF-3 files
-  + 24/06/2013: Version 0.5.3 – Over 90% Performance improvements for methods imported 
+  + 30/Dec/2014: Version 0.5.5.2 - Fix for StringArray
+  + 16/Nov/2014: Version 0.5.5.1 - Small bug fix
+  + 14/Nov/2013: Version 0.5.5 - Support for linear algebra methods
+  + 07/Aug/2013: Version 0.5.4 - Support for reading and writing NetCDF-3 files
+  + 24/Jun/2013: Version 0.5.3 – Over 90% Performance improvements for methods imported 
       from Parallel Colt and over 40% performance improvements for all other methods 
       (implemented in Ruby); 
-  + 16/05/2013: Version 0.5.0 - All loops transferred to Java with over 50% performance 
+  + 16/Mai/2013: Version 0.5.0 - All loops transferred to Java with over 50% performance 
       improvements.  Descriptive statistics from Parallel Colt;
-  + 19/04/2013: Version 0.4.3 - Fixes a simple, but fatal bug in 0.4.2.  No new features;
-  + 17/04/2013: Version 0.4.2 - Adds simple statistics and boolean operators;
-  + 05/04/2013: Version 0.4.0 – Initial release.
+  + 19/Apr/2013: Version 0.4.3 - Fixes a simple, but fatal bug in 0.4.2.  No new features;
+  + 17/Apr/2013: Version 0.4.2 - Adds simple statistics and boolean operators;
+  + 05/Apr/2013: Version 0.4.0 – Initial release.
 
-NetCDF-3 Writing with MDArray API
-=================================
-
-require 'mdarray'
-
-class NetCDF
-
-  attr_reader :dir, :filename, :max_strlen
-
-  #---------------------------------------------------------------------------------------
-  #
-  #---------------------------------------------------------------------------------------
-
-  def initialize
-    @dir = "~/tmp"
-    @filename1 = "testWriter"
-    @filename2 = "testWriteRecord2"
-    @max_strlen = 80
-  end
-    
-  #---------------------------------------------------------------------------------------
-  # Define the NetCDF-3 file
-  #---------------------------------------------------------------------------------------
-
-  def define_file
-      
-    # We pass the directory, filename, filetype and optionaly the outside_scope.  
-    #
-    # I'm implementing in cygwin, so the need for method cygpath that converts the 
-    # directory name to a Windows name.  In another environment, just pass the directory
-    # name.
-    # 
-    # Inside a block we have another scope, so the block cannot access any variables, etc. 
-    # from the ouside scope. If we pass the outside scope, in this case we are passing self,
-    # we can access variables in the outside scope by using @outside_scope.<variable>.
-    NetCDF.define(cygpath(@dir), @filename1, "netcdf3", self) do
-      
-      # add dimensions
-      dimension "lat", 64
-      dimension "lon", 128
-      
-      # add variables and attributes
-      # add Variable double temperature(lat, lon)
-      variable "temperature", "double", [@dim_lat, @dim_lon]
-      variable_att @var_temperature, "units", "K"
-      variable_att @var_temperature, "scale", [1, 2, 3]
-      
-      # add a string-value variable: char svar(80)
-      # note that this is created as a scalar variable although in NetCDF-3 there is no
-      # string type and the string has to be represented as a char type.
-      variable "svar", "string", [], {:max_strlen => @outside_scope.max_strlen}
-      
-      # add a 2D string-valued variable: char names(names, 80)
-      dimension "names", 3
-      variable "names", "string", [@dim_names], {:max_strlen => @outside_scope.max_strlen}
-      
-      # add a scalar variable
-      variable "scalar", "double", []
-      
-      # add global attributes
-      global_att "yo", "face"
-      global_att "versionD", 1.2, "double"
-      global_att "versionF", 1.2, "float"
-      global_att "versionI", 1, "int"
-      global_att "versionS", 2, "short"
-      global_att "versionB", 3, "byte"
-      
-    end
-
-  end
-
-  #---------------------------------------------------------------------------------------
-  # write data on the above define file
-  #---------------------------------------------------------------------------------------
-
-  def write_file
-
-    NetCDF.write(cygpath(@dir), @filename1, self) do
-
-      temperature = find_variable("temperature")
-      shape = temperature.shape
-      data = MDArray.fromfunction("double", shape) do |i, j|
-        i * 1_000_000 + j * 1_000
-      end
-      write(temperature, data)
-
-      svar = find_variable("svar")
-      write_string(svar, "Two pairs of ladies stockings!")
-
-      names = find_variable("names")
-      # careful here with the shape of a string variable.  A string variable has one
-      # more dimension than it should as there is no string type in NetCDF-3.  As such,
-      # if we look as names' shape it has 2 dimensions, be we need to create a one
-      # dimension string array.
-      data = MDArray.string([3], ["No pairs of ladies stockings!",
-                                  "One pair of ladies stockings!",
-                                  "Two pairs of ladies stockings!"])
-      write_string(names, data)
-
-      # write scalar data
-      scalar = find_variable("scalar")
-      write(scalar, 222.333 )
-
-    end
-
-  end
-
-  #---------------------------------------------------------------------------------------
-  # Define a file for writing one record at a time
-  #---------------------------------------------------------------------------------------
-
-  def define_one_at_time
-
-    NetCDF.define(cygpath(@dir), @filename2, "netcdf3", self) do
-      
-      dimension "lat", 3
-      dimension "lon", 4
-      # zero sized dimension is an unlimited dimension
-      dimension "time", 0
-      
-      variable "lat", "float", [@dim_lat]
-      variable_att @var_lat, "units", "degree_north"
-
-      variable "lon", "float", [@dim_lon]
-      variable_att @var_lon, "units", "degree_east"
-
-      variable "rh", "int", [@dim_time, @dim_lat, @dim_lon]
-      variable_att @var_rh, "long_name", "relative humidity"
-      variable_att @var_rh, "units", "percent"
-      
-      variable "T", "double", [@dim_time, @dim_lat, @dim_lon]
-      variable_att @var_t, "long_name", "surface temperature"
-      variable_att @var_t, "units", "degC"
-
-      variable "time", "int", [@dim_time]
-      variable_att @var_time, "units", "hours since 1990-01-01"
-
-    end
-
-  end
-
-  #---------------------------------------------------------------------------------------
-  # Define a file for writing one record at a time
-  #---------------------------------------------------------------------------------------
-
-  def write_one_at_time
-
-    NetCDF.write(cygpath(@dir), @filename2, self) do
-
-      lat = find_variable("lat")
-      lon = find_variable("lon")
-
-      # write non recored data to the variables
-      write(lat, MDArray.float([3], [41, 40, 39]))
-      write(lon, MDArray.float([4], [-109, -107, -105, -103]))
-
-      # get record variables from file
-      rh = find_variable("rh")
-      time = find_variable("time")
-      t = find_variable("T")
-
-      # there is no method find_dimension for NetcdfFileWriter, so we need to get the
-      # dimension from a variable.
-      rh_shape = rh.shape
-      dim_lat = rh_shape[1]
-      dim_lon = rh_shape[2]
-
-      (0...10).each do |time_idx|
-
-        # fill rh_data array
-        rh_data = MDArray.fromfunction("int", [dim_lat, dim_lon]) do |lat, lon|
-          time_idx * lat * lon
-        end
-        # reshape rh_data so that it has the same shape as rh variable
-        # Method reshape! reshapes the array in-place without data copying.
-        rh_data.reshape!([1, dim_lat, dim_lon])
-
-        # fill temp_data array
-        temp_data = MDArray.fromfunction("double", [dim_lat, dim_lon]) do |lat, lon|
-          time_idx * lat * lon / 3.14159
-        end
-        # reshape temp_data array so that it has the same shape as temp variable.
-        temp_data.reshape!([1, dim_lat, dim_lon])
-        
-        # write the variables
-        write(time, MDArray.int([1], [time_idx * 12]), [time_idx])
-        write(rh, rh_data, [time_idx, 0, 0])
-        write(t, temp_data, [time_idx, 0, 0])
-
-      end # End time_idx loop
-      
-    end
-
-  end
-
-end
-
-netcdf = NetCDF.new
-netcdf.define_file
-netcdf.write_file
-netcdf.define_one_at_time
-netcdf.write_one_at_time

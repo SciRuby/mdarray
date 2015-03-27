@@ -105,6 +105,7 @@ class FastBinaryOperator < BinaryOperator
     get_args(*args) do |op1, op2, shape, *other_args|
       helper = @helper::FillBinaryOperator
       helper.send("apply", op1, op2)
+
     end
 
   end
@@ -131,6 +132,7 @@ class FastBinaryOperator < BinaryOperator
     calc = nil
 
     get_args(*args) do |op1, op2, shape, *other_args|
+      # return nil if op2 == nil
       helper = @helper::ReduceBinaryOperator
       calc = @pre_condition_result
       calc = helper.send("apply", calc, op1, op2, @do_func)
@@ -149,6 +151,7 @@ class FastBinaryOperator < BinaryOperator
     calc = nil
 
     get_args(*args) do |op1, op2, shape, *other_args|
+      # return nil if op2 == nil
       helper = @helper::ComplexReduceBinaryOperator
       calc = @pre_condition_result
       calc = helper.send("apply", calc, op1, op2, @do_func)
